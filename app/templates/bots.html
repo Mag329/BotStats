@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Серверы{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        {% if bots|length > 0 %}
+            {% for el in bots %}
+            <div class="shadow p-3 mb-5 bot-div rounded">
+                <h2>{{ el.name }}</h2>
+                <a href="/bot/{{ el.id }}" class="btn btn-primary">Подробнее</a>
+            </div>
+            {% endfor %}
+            <div class="center-data">
+                <a href="/bots/new_bot" class="btn btn-primary">Добавить бота</a>
+            </div>
+        {% else %}
+        <div class="center-data">
+            <p>У нас еще нет добавленных серверов</p>
+            <a href="/bots/new_bot" class="btn btn-primary">Добавить бота</a>
+        </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

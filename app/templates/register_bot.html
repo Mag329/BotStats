@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация сервера{% endblock %}
+
+{% block body %}
+
+<div class="container pt-4 my-emd-5 pt-md-5" style="width: 350px">
+    <form method="post" class="row">
+        <div class="form-outline mb-4">
+            <input type="text" name="name" id="name" placeholder="Название" required class="form-control form-control-lg">
+        </div>
+        <div class="form-outline mb-4 d-grid gap-2">
+            <input type="hidden" id="token" name="token" value="">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tokenModal">Сгенерировать токен</button>
+        </div>
+        <div class="form-outline mb-4 d-grid gap-2">
+            <input type="submit" class="btn btn-success" name="submit" id="submit" value="Добавить">
+        </div>
+    </form>
+</div>
+
+
+<div class="modal fade" id="tokenModal" tabindex="-1" aria-labelledby="tokenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tokenModalLabel">Токен доступа</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Текстовое поле с токеном -->
+          <input type="text" readonly class="form-control form-control-lg" value="" id="tokenInput">
+        </div>
+        <div class="modal-footer">
+            <!-- Кнопка "Сгенерировать токен" -->
+            <button type="button" class="btn btn-danger" onclick="generateToken()">Сгенерировать токен</button>
+            <!-- Кнопка "Скопировать токен" -->
+            <button type="button" class="btn btn-primary" onclick="copyToken()">Скопировать токен</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function generateToken() {
+        fetch('/api/generate_token')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("tokenInput").value = data.token;
+                document.getElementById("token").value = data.token;
+            })
+            .catch(error => console.error('Ошибка при получении токена:', error));
+    }
+
+    function copyToken() {
+        var tokenInput = document.getElementById("tokenInput");
+        tokenInput.select();
+        document.execCommand("copy");
+    }
+</script>
+{% endblock %}

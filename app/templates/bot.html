@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ bot.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="shadow p-3 mb-5 bot-div rounded">
+        <h2>{{ bot.name }}</h2>
+        <p><b>Пользователей:</b> {{ data.members }}</p>
+
+        <a href="/bot/{{ bot.id }}/edit" class="btn btn-success">Изменить</a>
+        <a href="/bot/{{ bot.id }}/delete" class="btn btn-danger">Удалить</a>
+    </div>
+</div>
+
+<canvas id="myChart" width="400" height="200"></canvas>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Парсим данные, полученные из Flask
+    var json_data = {{ data | safe }};
+    console.log(json_data)
+    // Создаем массивы для меток (labels) и данных (values) для графика
+    var labels = [];
+    var values = [];
+
+    // Итерируемся по данным и выводим их в консоль для отладки
+    console.log("Data for Chart:");
+    json_data.forEach(function(entry) {
+        console.log(entry.timestamp, entry.data.members);
+        labels.push(entry.timestamp);
+        values.push(entry.data.members);
+    });
+
+    // Проверяем, что данные заполнились правильно
+    console.log("Labels:", labels);
+    console.log("Values:", values);
+
+    // Создаем контекст для графика
+    var ctx = document.getElementById('myChart').getContext('2d');
+
+    // Создаем объект графика с использованием Chart.js
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Количество пользователей',
+                data: values,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
