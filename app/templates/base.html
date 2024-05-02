@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/x-icon">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header class="header-outer" id="header_page">
@@ -22,16 +24,17 @@
             </nav>
         </div>
 
-        
-        {% if current_user.is_authenticated %}
-            <div class="header-navigation" style="margin-right: 30px;">
-                <a href="/logout">Выйти</a>
-            </div>
-        {% else %}
-            <div class="header-navigation" style="margin-right: 30px;">
-                <a href="/login">Войти</a>
-            </div>
-        {% endif %}
+        <div class="header-auth">
+            {% if current_user.is_authenticated %}
+                <div class="header-navigation" style="margin-right: 30px;">
+                    <a href="/logout">Выйти</a>
+                </div>
+            {% else %}
+                <div class="header-navigation" style="margin-right: 30px;">
+                    <a href="/login">Войти</a>
+                </div>
+            {% endif %}
+        </div>
     </header>
 
     <div class="flash-messages">

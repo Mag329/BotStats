@@ -6,61 +6,98 @@
 <div class="container mt-5">
     <div class="shadow p-3 mb-5 bot-div rounded">
         <h2>{{ bot.name }}</h2>
-        <p><b>Пользователей:</b> {{ data.members }}</p>
+        <p><b>Пользователей:</b> {{ last_data.members }}</p>
+        <canvas id="MembersChart" height="50"></canvas>
+
+        <p><b>Активных пользователей за неделю: </b> {{ last_data.active_members }}</p>
+        
+        <canvas id="ActiveMembersChart" height="50"></canvas>
 
         <a href="/bot/{{ bot.id }}/edit" class="btn btn-success">Изменить</a>
         <a href="/bot/{{ bot.id }}/delete" class="btn btn-danger">Удалить</a>
     </div>
 </div>
-
-<canvas id="myChart" width="400" height="200"></canvas>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Парсим данные, полученные из Flask
-    var json_data = {{ data | safe }};
-    console.log(json_data)
-    // Создаем массивы для меток (labels) и данных (values) для графика
+    // Получите данные, переданные из Flask в шаблон
+    var dataFromFlask = {{ data | tojson }};
+    console.log(dataFromFlask);
+    
+    // Создайте массивы для данных графиков
     var labels = [];
-    var values = [];
+    var membersData = [];
+    var activeMembers = [];
 
-    // Итерируемся по данным и выводим их в консоль для отладки
-    console.log("Data for Chart:");
-    json_data.forEach(function(entry) {
-        console.log(entry.timestamp, entry.data.members);
-        labels.push(entry.timestamp);
-        values.push(entry.data.members);
+    // Пройдитесь по данным и извлеките значения members и active_members
+    dataFromFlask.forEach(function(item) {
+        labels.push(item.timestamp);
+        membersData.push(item.members);
+        activeMembers.push(item.active_members);
     });
 
-    // Проверяем, что данные заполнились правильно
-    console.log("Labels:", labels);
-    console.log("Values:", values);
+    // Создайте объект данных для графика "Участники"
+    var membersChartData = {
+        labels: labels,
+        datasets: [{
+            label: 'Пользователей',
+            data: membersData,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    };
 
-    // Создаем контекст для графика
-    var ctx = document.getElementById('myChart').getContext('2d');
-
-    // Создаем объект графика с использованием Chart.js
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Количество пользователей',
-                data: values,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
+    // Настройте параметры графика "Участники"
+    var membersChartOptions = {
+        scales: {
+            yAxes: [{
+                ticks: {
                     beginAtZero: true
                 }
-            }
+            }]
         }
+    };
+
+    // Получите контекст холста для отображения графика "Участники"
+    var membersCtx = document.getElementById('MembersChart').getContext('2d');
+
+    // Создайте и отобразите график "Участники"
+    var membersChart = new Chart(membersCtx, {
+        type: 'line',
+        data: membersChartData,
+        options: membersChartOptions
+    });
+
+    // Создайте объект данных для графика "Активные участники"
+    var activeMembersChartData = {
+        labels: labels,
+        datasets: [{
+            label: 'Активных пользователей',
+            data: activeMembers,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    // Настройте параметры графика "Активные участники"
+    var activeMembersChartOptions = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    };
+
+    // Получите контекст холста для отображения графика "Активные участники"
+    var activeMembersCtx = document.getElementById('ActiveMembersChart').getContext('2d');
+
+    // Создайте и отобразите график "Активные участники"
+    var activeMembersChart = new Chart(activeMembersCtx, {
+        type: 'line',
+        data: activeMembersChartData,
+        options: activeMembersChartOptions
     });
 </script>
-
 {% endblock %}

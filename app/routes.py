@@ -27,20 +27,13 @@ def bots():
 @login_required
 def bot(id):
     bot = Bot.query.filter_by(id=id).first()
-    data = Data.query.filter_by(token=Bot.token).order_by(Data.timestamp.desc()).all()
-    # data = json.loads(data)
+    data = Data.query.filter_by(token=bot.token).order_by(Data.timestamp.desc()).all()
+
+    formatted_data = [{'timestamp': d.timestamp, 'members': json.loads(d.data)['members'], 'active_members': json.loads(d.data)['active_members']} for d in data]
+    formatted_data.reverse()
     
-    data_dicts = []
-    for entry in data:
-        entry_dict = {
-            'id': entry.id,
-            'token': entry.token,
-            'data': entry.data,
-            'timestamp': entry.timestamp
-        }
-        data_dicts.append(entry_dict)
-    data_json = json.dumps(data_dicts)
-    return render_template('bot.html', bot=bot, data=data_json)
+    last_data = json.loads(data[-1].data)
+    return render_template('bot.html', bot=bot, last_data=last_data, data=formatted_data)
 
 
 @app.route('/bot/<int:id>/edit', methods=['GET', 'POST'])
