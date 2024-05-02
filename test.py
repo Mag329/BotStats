@@ -2,14 +2,14 @@ import requests
 
 
 data = {
-    "members": "150",
-    "active_members": "1"
+    "members": "180",
+    "active_members": "100"
 }
 
 requests.post(
-    url="http://127.0.0.1:5000/api/get_info",
+    url="http://127.0.0.1:5200/api/get_info",
     headers={
-        "token": "zLjv0i6oS7JH8xiykh3LQFexcocDqEZe"
+        "token": "leJiekR7IqEMEBcHbZjNKcDkO7p1gMqv"
     },
     json=data
 )

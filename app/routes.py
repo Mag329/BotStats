@@ -28,11 +28,12 @@ def bots():
 def bot(id):
     bot = Bot.query.filter_by(id=id).first()
     data = Data.query.filter_by(token=bot.token).order_by(Data.timestamp.desc()).all()
-
+    data.reverse()
     formatted_data = [{'timestamp': d.timestamp, 'members': json.loads(d.data)['members'], 'active_members': json.loads(d.data)['active_members']} for d in data]
-    formatted_data.reverse()
-    
+    # formatted_data.reverse()
+    print(data)
     last_data = json.loads(data[-1].data)
+    print(last_data)
     return render_template('bot.html', bot=bot, last_data=last_data, data=formatted_data)
 
 
