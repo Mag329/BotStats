@@ -2,7 +2,7 @@ from flask import render_template, redirect, request, flash, jsonify
 from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import datetime
+from datetime import datetime
 import json
 
 from app import app, db
@@ -28,12 +28,11 @@ def bots():
 def bot(id):
     bot = Bot.query.filter_by(id=id).first()
     data = Data.query.filter_by(token=bot.token).order_by(Data.timestamp.desc()).all()
+    if data == []:
+        return render_template('bot.html', bot=bot, last_data=None, data=None)
     data.reverse()
-    formatted_data = [{'timestamp': d.timestamp, 'members': json.loads(d.data)['members'], 'active_members': json.loads(d.data)['active_members']} for d in data]
-    # formatted_data.reverse()
-    print(data)
+    formatted_data = [{'timestamp': datetime.strptime(d.timestamp, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S"), 'members': json.loads(d.data)['members'], 'popular_type': json.loads(d.data)['popular_type'], 'type_amount_voice': json.loads(d.data)['type_amount_voice'], 'type_amount_text': json.loads(d.data)['type_amount_text']} for d in data]
     last_data = json.loads(data[-1].data)
-    print(last_data)
     return render_template('bot.html', bot=bot, last_data=last_data, data=formatted_data)
 
 
@@ -155,13 +154,13 @@ def return_token():
 
 
 
-@app.route('/api/get_info', methods=['POST'])
+@app.route('/api/send_stats', methods=['POST'])
 def get_info():
     token = request.headers.get('token')
     
     data = request.json
     data = json.dumps(data)
-    timestamp = datetime.datetime.now()
+    timestamp = datetime.now()
     
     new_data = Data(token=token, data=data, timestamp=timestamp)
     

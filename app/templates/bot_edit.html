@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Регистрация сервера{% endblock %}
+{% block title %}Изменение бота{% endblock %}
 
 {% block body %}
 
 <div class="container pt-4 my-emd-5 pt-md-5" style="width: 350px">
     <form method="post" class="row">
         <div class="form-outline mb-4">
-            <input type="text" name="name" id="name" placeholder="Название" required class="form-control form-control-lg">
+            <input type="text" name="name" id="name" placeholder="Название" required value="{{ bot.name }}" class="form-control form-control-lg">
         </div>
         <div class="form-outline mb-4 d-grid gap-2">
             <input type="hidden" id="token" name="token" value="">

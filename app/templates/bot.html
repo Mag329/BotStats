@@ -3,16 +3,21 @@
 {% block title %}{{ bot.name }}{% endblock %}
 
 {% block body %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div class="container mt-5">
     <div class="shadow p-3 mb-5 bot-div rounded">
         <h2>{{ bot.name }}</h2>
         <p><b>Пользователей:</b> {{ last_data.members }}</p>
         <canvas id="MembersChart" height="50"></canvas>
 
-        <p><b>Активных пользователей за неделю: </b> {{ last_data.active_members }}</p>
+        <p><b>Популярный тип общениия: </b> {{ last_data.popular_type }}</p>
         
-        <canvas id="ActiveMembersChart" height="50"></canvas>
+        <canvas id="PopularTypeChart" height="50"></canvas>
 
+        <p><b>Всего токенов: </b> {{ last_data.total_tokens }}</p>
+        <p><b>Всего символов: </b> {{ last_data.total_symbols }}</p>
+        <p><b>Всего блоков: </b> {{ last_data.total_blocks }}</p>
         <a href="/bot/{{ bot.id }}/edit" class="btn btn-success">Изменить</a>
         <a href="/bot/{{ bot.id }}/delete" class="btn btn-danger">Удалить</a>
     </div>
@@ -20,18 +25,19 @@
 <script>
     // Получите данные, переданные из Flask в шаблон
     var dataFromFlask = {{ data | tojson }};
-    console.log(dataFromFlask);
     
     // Создайте массивы для данных графиков
     var labels = [];
     var membersData = [];
-    var activeMembers = [];
+    var voiceAmount = [];
+    var textAmount = [];
 
     // Пройдитесь по данным и извлеките значения members и active_members
     dataFromFlask.forEach(function(item) {
         labels.push(item.timestamp);
         membersData.push(item.members);
-        activeMembers.push(item.active_members);
+        voiceAmount.push(item.type_amount_voice);
+        textAmount.push(item.type_amount_text);
     });
 
     // Создайте объект данных для графика "Участники"
@@ -71,15 +77,20 @@
     var activeMembersChartData = {
         labels: labels,
         datasets: [{
-            label: 'Активных пользователей',
-            data: activeMembers,
+            label: 'Voice',
+            data: voiceAmount,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }, {
+            label: 'Text',
+            data: textAmount,
             backgroundColor: 'rgba(54, 162, 235, 0.2)',
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1
         }]
     };
 
-    // Настройте параметры графика "Активные участники"
     var activeMembersChartOptions = {
         scales: {
             yAxes: [{
@@ -90,8 +101,7 @@
         }
     };
 
-    // Получите контекст холста для отображения графика "Активные участники"
-    var activeMembersCtx = document.getElementById('ActiveMembersChart').getContext('2d');
+    var activeMembersCtx = document.getElementById('PopularTypeChart').getContext('2d');
 
     // Создайте и отобразите график "Активные участники"
     var activeMembersChart = new Chart(activeMembersCtx, {
